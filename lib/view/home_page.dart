@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:refactor_weather_api/view/forecast_page.dart';
 import 'package:refactor_weather_api/model/weathers.dart';
 import 'package:refactor_weather_api/weather_data.dart';
-
+import 'package:refactor_weather_api/weather_api.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,15 +22,26 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = index;
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    WeatherData weatherData = WeatherData();
-    weathers = weatherData.mockDataInit();
+    weathers.add(
+        Weather(minT: 0, maxT: 0, wx: 'wx', ci: 'ci', pop: 0, city: 'city'));
+    weathers.add(
+        Weather(minT: 0, maxT: 0, wx: 'wx', ci: 'ci', pop: 0, city: 'city'));
+    weathers.add(
+        Weather(minT: 0, maxT: 0, wx: 'wx', ci: 'ci', pop: 0, city: 'city'));
 
+    init();
   }
+
   @override
+  Future<void> init() async {
+    weathers = await getWeatherData(location);
+    setState(() {});
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,13 +67,14 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             Expanded(
               child: TextField(
-                onChanged: (value){
+                onChanged: (value) async {
                   location = value;
+                  weathers = await getWeatherData(location);
                 },
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
@@ -74,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Expanded(child: ForecastPage(weather: weathers[_selectedIndex],)),
+            Expanded(child: ForecastPage(weather: weathers[_selectedIndex])),
           ],
         ),
       ),

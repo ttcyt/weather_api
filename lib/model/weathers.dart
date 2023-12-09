@@ -1,17 +1,17 @@
 class Weather {
-  String ?city;
-  int ?minT;
-  int ?maxT;
-  String ?wx;
-  String ?ci;
-  int ?pop;
+  String city;
+  int minT;
+  int maxT;
+  String wx;
+  String ci;
+  int pop;
 
   Weather({
-    this.minT,
-    this.maxT,
-    this.wx,
-    this.ci,
-    this.pop,
-    this.city,
+    required this.minT,
+    required this.maxT,
+    required this.wx,
+    required this.ci,
+    required this.pop,
+    required this.city,
   });
 }
