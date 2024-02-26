@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:refactor_weather_api/view/forecast_page.dart';
 import 'package:refactor_weather_api/model/weathers.dart';
-import 'package:refactor_weather_api/weather_data.dart';
 import 'package:refactor_weather_api/weather_api.dart';
+import 'package:refactor_weather_api/component/location.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,36 +13,39 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isInit = true;
-  String location = '';
   int _selectedIndex = 0;
-  List<Weather> weathers = [];
+  List<Weather> cityWeathers = [];
+  final FocusNode _focus = FocusNode();
+  String _location = '';
+  final TextEditingController _textController = TextEditingController();
+
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+  }
+  Future<void> init() async {
+    cityWeathers = await WeatherService.getWeatherData(_location);
+    setState(() {});
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    weathers.add(
-        Weather(minT: 0, maxT: 0, wx: 'wx', ci: 'ci', pop: 0, city: 'city'));
-    weathers.add(
-        Weather(minT: 0, maxT: 0, wx: 'wx', ci: 'ci', pop: 0, city: 'city'));
-    weathers.add(
-        Weather(minT: 0, maxT: 0, wx: 'wx', ci: 'ci', pop: 0, city: 'city'));
-
+    _focus.addListener(() {
+      showSearch(context: context, delegate: CustomSearchDelegate(queryLocation:(location){
+        _location = location;
+        _textController.text = location;
+      }));
+    });
     init();
   }
 
-  @override
-  Future<void> init() async {
-    weathers = await getWeatherData(location);
-    setState(() {});
-  }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Visibility(
@@ -72,10 +75,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               child: TextField(
-                onChanged: (value) async {
-                  location = value;
-                  weathers = await getWeatherData(location);
+                onChanged: (value) {
                 },
+                focusNode:_focus,
+                controller: _textController,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: const Icon(Icons.clear),
@@ -86,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Expanded(child: ForecastPage(weather: weathers[_selectedIndex])),
+
           ],
         ),
       ),
